@@ -18,11 +18,11 @@ public struct NavigationID: @unchecked Sendable {
   public var next: @Sendable () -> AnyHashable
 
   public static let live = Self { UUID() }
-  public static var incrementing: Self {
-    var count = 1
-    return Self {
-      defer { count += 1 }
-      return count
-    }
-  }
+//  public static var incrementing: Self {
+//    var count = 1
+//    return Self {
+//      defer { count += 1 }
+//      return count
+//    }
+//  }
 }
