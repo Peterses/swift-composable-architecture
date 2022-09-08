@@ -60,8 +60,10 @@ struct LoadThenNavigateList: ReducerProtocol {
         return .none
       }
     }
-    .presentationDestination(\.$selection, action: /Action.selection) {
-      Counter()
+    .ifLet(\.selection, action: /Action.counter) {
+      Scope(state: \Identified<State.Row.ID, Counter.State>.value, action: /.self) {
+        Counter()
+      }
     }
   }
 }

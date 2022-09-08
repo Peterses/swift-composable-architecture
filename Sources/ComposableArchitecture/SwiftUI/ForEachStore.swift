@@ -96,12 +96,21 @@ public struct ForEachStore<
   where
     Data == IdentifiedArray<ID, EachState>,
     Content == WithViewStore<
-      OrderedSet<ID>, (ID, EachAction), ForEach<OrderedSet<ID>, ID, EachContent>
+      OrderedSet<ID>, (ID, EachAction),
+      _ConditionalContent<
+        AnyView,
+        _ObservedObjectViewStore<
+          OrderedSet<ID>, (ID, EachAction), ForEach<OrderedSet<ID>, ID, EachContent>
+        >
+      >
     >
   {
     self.data = store.state.value
     self.content = {
-      WithViewStore(store.scope(state: { $0.ids })) { viewStore in
+      WithViewStore(
+        store.scope(state: { $0.ids }),
+        removeDuplicates: areOrderedSetsDuplicates
+      ) { viewStore in
         ForEach(viewStore.state, id: \.self) { id -> EachContent in
           // NB: We cache elements here to avoid a potential crash where SwiftUI may re-evaluate
           //     views for elements no longer in the collection.
@@ -125,4 +134,15 @@ public struct ForEachStore<
   public var body: some View {
     self.content()
   }
+}
+
+private func areOrderedSetsDuplicates<ID: Hashable>(lhs: OrderedSet<ID>, rhs: OrderedSet<ID>)
+  -> Bool
+{
+  var lhs = lhs
+  var rhs = rhs
+  if memcmp(&lhs, &rhs, MemoryLayout<OrderedSet<ID>>.size) == 0 {
+    return true
+  }
+  return lhs == rhs
 }

@@ -1,5 +1,6 @@
 import Combine
 import ComposableArchitecture
+import Foundation
 import XCTestDynamicOverlay
 
 struct FactClient {
@@ -12,7 +13,7 @@ extension DependencyValues {
     set { self[FactClientKey.self] = newValue }
   }
 
-  private enum FactClientKey: LiveDependencyKey {
+  private enum FactClientKey: DependencyKey {
     static let liveValue = FactClient.live
     static let testValue = FactClient.unimplemented
   }
